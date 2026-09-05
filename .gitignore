@@ -1,0 +1,39 @@
+# ---- privacy: never commit source photos or subject artifacts ----
+work/
+out/
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.heif
+*.webp
+*.tiff
+!docs/**/*.png
+!bakeoff/reference/*.png
+
+# ---- meshes and prints are build output ----
+*.glb
+*.gltf
+*.obj
+*.ply
+*.stl
+*.3mf
+*.gcode
+!configs/**/*.json
+!tests/fixtures/**/*.stl
+
+# ---- python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# ---- model weights ----
+weights/
+*.safetensors
+*.ckpt

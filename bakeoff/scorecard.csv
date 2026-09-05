@@ -1,0 +1,10 @@
+backend,reference,watertight,shells,open_boundary_loops,min_wall_mm,slices_unedited,manual_repair_min,likeness_1_5,style_consistency_1_5,notes
+trellis2,ref_a,,,,,,,,,
+trellis2,ref_b,,,,,,,,,
+trellis2,ref_c,,,,,,,,,
+meshy,ref_a,,,,,,,,,
+meshy,ref_b,,,,,,,,,
+meshy,ref_c,,,,,,,,,
+tripo,ref_a,,,,,,,,,
+tripo,ref_b,,,,,,,,,
+tripo,ref_c,,,,,,,,,

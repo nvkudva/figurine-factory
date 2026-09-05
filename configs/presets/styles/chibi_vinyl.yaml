@@ -1,0 +1,28 @@
+name: chibi_vinyl
+version: 1
+description: >
+  Matte vinyl designer-toy look. Chunky proportions that survive FDM at 100 mm:
+  thick limbs, fused hair mass, no thin props. Every figurine in a set matches
+  because prompt, sampler and seed policy are pinned here.
+
+head_to_body_ratio: 1:2.2
+camera: three-quarter front, eye level, full body, centered
+background: flat neutral grey, no shadow
+
+prompt: >
+  full-body chibi vinyl designer toy of the person, stylized cartoon proportions,
+  large rounded head, simplified facial features, thick sturdy limbs, hair as one
+  smooth fused mass, matte vinyl surface, soft even studio lighting, neutral A-pose,
+  standing on a small round plinth, flat neutral grey background, centered, full body
+  in frame, no cropping
+
+negative_prompt: >
+  thin fingers, separated hair strands, floating accessories, props, weapons, text,
+  watermark, multiple figures, cropped limbs, photorealistic skin pores, harsh shadows,
+  busy background, transparent materials
+
+model: sdxl-turbo          # placeholder until D1/D2 are decided
+sampler: dpmpp_2m
+steps: 30
+cfg_scale: 5.5
+seed_policy: pin           # pin | random-and-record

@@ -1,0 +1,55 @@
+# Base config. Override per run on the CLI or with --config.
+subject_alias: subject   # never a real name; used in output paths and the manifest
+
+intake:
+  min_images: 3
+  max_images: 8
+  min_short_edge_px: 1024
+  strip_exif: true
+
+stylize:
+  preset: chibi_vinyl
+  seed: 0                # 0 = draw and record; any other value pins it
+
+generate:
+  backend: trellis2      # trellis2 | hunyuan3d | meshy | tripo
+  allow_upload: false    # hosted backends refuse to run unless this is true
+  seed: 0
+  target_faces: 300000
+
+repair:
+  min_shell_volume_frac: 0.005
+  max_hole_perimeter_mm: 25.0
+  remesh_fallback: voxel     # voxel | poisson | none
+  thicken_thin_walls: true
+  base:
+    enabled: true
+    shape: rounded_square    # rounded_square | cylinder
+    height_mm: 3.0
+    chamfer_mm: 0.6
+    margin_mm: 2.0
+  orient:
+    search: true
+    candidates: 64
+    weight_overhang: 0.7
+    weight_base_area: 0.3
+  scale:
+    target_height_mm: 100.0
+
+validate:
+  require_watertight: true
+  require_winding_consistent: true
+  max_shells: 1
+  max_open_boundary_loops: 0
+  min_wall_thickness_mm: null   # null = 2 x nozzle from the printer profile
+  min_feature_size_mm: 1.2
+  min_base_flatness_frac: 0.90
+  min_base_area_frac: 0.08
+  max_overhang_area_frac: 0.25
+  max_self_intersections: 0
+
+printer: bambu_p1s_0.4
+
+slice:
+  plate: 0
+  verify_gcode_present: true

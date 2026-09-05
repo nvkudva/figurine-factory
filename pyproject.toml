@@ -1,0 +1,38 @@
+[project]
+name = "figurine-factory"
+version = "0.1.0"
+description = "Photos to a print-ready, stylized 3D figurine for Bambu printers."
+requires-python = ">=3.10"
+dependencies = [
+    "trimesh[easy]>=4.4",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "networkx>=3.2",
+    "manifold3d>=2.5",
+    "pymeshlab>=2023.12",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+    "rich>=13.7",
+    "pillow>=10.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2", "ruff>=0.5", "pre-commit>=3.7"]
+local-gen = ["torch>=2.4", "torchvision>=0.19"]
+
+[project.scripts]
+figurine = "figurine_factory.cli:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

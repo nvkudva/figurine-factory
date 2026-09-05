@@ -1,0 +1,11 @@
+name: Bambu Lab P1S
+nozzle_diameter_mm: 0.4
+build_volume_mm: [256, 256, 256]
+layer_height_mm: 0.16
+max_overhang_angle_deg: 45
+# Paths are resolved relative to configs/printers/. Export these from Bambu Studio:
+# Preset dropdown -> the "..." menu -> Export preset.
+machine_settings: profiles/p1s_machine.json
+process_settings: profiles/p1s_0.16_standard.json
+filament_settings: profiles/pla_basic.json
+bed_type: "Textured PEI Plate"
