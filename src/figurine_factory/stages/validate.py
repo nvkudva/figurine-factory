@@ -59,12 +59,12 @@ def run_gates(mesh: trimesh.Trimesh, cfg: dict, printer: dict) -> list[GateResul
               "inverted normals or a non-watertight mesh; check the watertight gate first")
     )
 
-    measured_wall, thin = thickness.min_wall_thickness(mesh)
+    measured_wall, thin = thickness.min_wall_thickness(mesh, threshold_mm=min_wall)
     results.append(
         _gate("min_wall_thickness", measured_wall >= min_wall,
               f"{measured_wall:.2f} mm at {len(thin)} sites", f">= {min_wall:.2f} mm",
-              f"scale up (--height above {cfg.get('_target_height', 100):.0f} mm) or use a "
-              "style preset with chunkier extremities")
+              "scale the figurine taller with --height, or use a style preset with "
+              "chunkier extremities (thicker limbs, fused hair)")
     )
 
     extents = mesh.extents

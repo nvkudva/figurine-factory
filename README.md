@@ -34,8 +34,8 @@ These are photos of my child.
 | --- | --- |
 | 1. Generator bake-off | not started — see [`bakeoff/`](bakeoff/) |
 | 2. Manual end-to-end figurine | not started |
-| 3. Repair automated | **scaffolded** — `figurine repair` runs today on any mesh |
-| 4. Validation gates | **scaffolded** — `figurine validate`, 8 gates, tested |
+| 3. Repair automated | **working** — `figurine repair` runs today on any mesh |
+| 4. Validation gates | **working** — `figurine validate`, 8 gates, 15 tests green |
 | 5. One-command run | blocked on D1 (generator choice) |
 | 6. Second subject, no manual editing | not started |
 | 7. README with comparison table + photos | not started |
@@ -71,12 +71,26 @@ Exit codes: `0` pass · `2` validation failure · `3` generation failure · `4` 
 Gates fail loudly and name the fix. Nothing is written when a gate fails.
 
 ```
+$ figurine repair tests/fixtures/thin_wall.stl --height 20
 2 validation gate(s) failed:
-  FAIL min_wall_thickness: 0.41 mm at 3 sites, needs >= 0.80 mm
-       fix: scale up (--height above 100 mm) or use a style preset with chunkier extremities
-  FAIL shell_count: 5, needs <= 1
+  FAIL shell_count: measured 2, needs <= 1
        fix: lower repair.min_shell_volume_frac to drop more debris, or the base union failed
+  FAIL min_wall_thickness: measured 0.06 mm at 1848 sites, needs >= 0.80 mm
+       fix: scale the figurine taller with --height, or use a style preset with chunkier
+            extremities (thicker limbs, fused hair)
 No mesh was written. A bad STL is worse than no STL.
+```
+
+And a run that passes writes the STL, a manifest, and a before/after report:
+
+```
+| stat                | before | after  |
+| vertices            | 9264   | 1415   |
+| shells              | 5      | 1      |
+| watertight          | False  | True   |
+| open boundary loops | 1      | 0      |
+| min wall (mm)       | 2.26   | 3.40   |
+| bbox (mm)           | [51.2, 32.0, 86.0] | [43.2, 43.2, 100.0] |
 ```
 
 ## Repository layout

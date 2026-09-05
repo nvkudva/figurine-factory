@@ -45,23 +45,37 @@ def _open_boundary_loops(mesh: trimesh.Trimesh) -> int:
     return nx.number_connected_components(g)
 
 
-def collect(mesh: trimesh.Trimesh, *, min_wall_mm: float | None = None) -> MeshStats:
-    """Snapshot a mesh. Cheap enough to run at every stage boundary."""
-    bodies = mesh.split(only_watertight=False)
+def collect(mesh: trimesh.Trimesh, *, measure_wall: bool = False) -> MeshStats:
+    """Snapshot a mesh. Cheap enough to run at every stage boundary.
+
+    Topology is measured on a vertex-merged copy. STL stores every triangle with its own
+    three vertices, so shell and boundary counts on a raw STL would otherwise report one
+    shell per face — a artifact of the file format, not a defect in the model.
+    """
+    topo = mesh.copy()
+    topo.merge_vertices()
+    bodies = topo.split(only_watertight=False)
+
+    min_wall = None
+    if measure_wall:
+        from .thickness import min_wall_thickness
+
+        min_wall = round(min_wall_thickness(topo, samples=5000)[0], 3)
+
     return MeshStats(
         vertices=int(len(mesh.vertices)),
         faces=int(len(mesh.faces)),
         shells=int(len(bodies)) if len(bodies) else 1,
-        watertight=bool(mesh.is_watertight),
-        winding_consistent=bool(mesh.is_winding_consistent),
-        open_boundary_loops=_open_boundary_loops(mesh),
-        volume_mm3=float(mesh.volume) if mesh.is_watertight else float("nan"),
-        area_mm2=float(mesh.area),
+        watertight=bool(topo.is_watertight),
+        winding_consistent=bool(topo.is_winding_consistent),
+        open_boundary_loops=_open_boundary_loops(topo),
+        volume_mm3=float(topo.volume) if topo.is_watertight else float("nan"),
+        area_mm2=float(topo.area),
         bbox_mm=[float(x) for x in mesh.extents],
-        euler_number=int(mesh.euler_number),
+        euler_number=int(topo.euler_number),
         degenerate_faces=int((~mesh.nondegenerate_faces()).sum()),
-        duplicate_faces=int(len(mesh.faces) - len(np.unique(mesh.faces_sorted, axis=0))),
-        min_wall_mm=min_wall_mm,
+        duplicate_faces=int(len(mesh.faces) - len(np.unique(np.sort(mesh.faces, axis=1), axis=0))),
+        min_wall_mm=min_wall,
     )
 
 

@@ -23,12 +23,16 @@ def _git_sha() -> str:
 
 
 def _tool_versions() -> dict:
+    """Read versions from package metadata, not by importing — importing pymeshlab
+    pulls in Qt plugins and prints a wall of warnings on headless machines."""
+    from importlib.metadata import PackageNotFoundError, version
+
     versions = {"python": platform.python_version(), "platform": platform.platform()}
-    for mod in ("trimesh", "numpy", "pymeshlab"):
+    for pkg in ("trimesh", "numpy", "pymeshlab", "manifold3d"):
         try:
-            versions[mod] = __import__(mod).__version__
-        except Exception:
-            versions[mod] = "not installed"
+            versions[pkg] = version(pkg)
+        except PackageNotFoundError:
+            versions[pkg] = "not installed"
     return versions
 
 

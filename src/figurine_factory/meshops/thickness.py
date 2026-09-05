@@ -31,17 +31,21 @@ def sample_thickness(
 
 
 def min_wall_thickness(
-    mesh: trimesh.Trimesh, samples: int = 20000, percentile: float = 0.5
+    mesh: trimesh.Trimesh, threshold_mm: float | None = None, samples: int = 20000,
+    percentile: float = 0.5,
 ) -> tuple[float, np.ndarray]:
-    """Minimum wall thickness in mm, plus the points that violate it.
+    """Minimum wall thickness in mm, plus the sample points that fall below `threshold_mm`.
 
-    Uses a low percentile rather than the raw minimum: a single stray ray through a
-    crease should not fail an otherwise sound model.
+    The reported minimum uses a low percentile rather than the raw minimum: one stray ray
+    through a crease should not fail an otherwise sound model. The returned points use the
+    real threshold, so a failure can name where the thin regions are.
     """
     dist, points = sample_thickness(mesh, samples=samples)
     if dist.size == 0:
         return float("inf"), np.array([]).reshape(0, 3)
-    return float(np.percentile(dist, percentile)), points[dist < np.percentile(dist, percentile)]
+    measured = float(np.percentile(dist, percentile))
+    limit = threshold_mm if threshold_mm is not None else measured
+    return measured, points[dist < limit]
 
 
 def thin_sites(mesh: trimesh.Trimesh, threshold_mm: float, samples: int = 20000) -> np.ndarray:

@@ -15,7 +15,7 @@ def good_figure() -> trimesh.Trimesh:
     """A crude but sound figure: sphere head on a capsule body, watertight."""
     body = trimesh.creation.capsule(height=40, radius=12, count=[32, 32])
     head = trimesh.creation.icosphere(subdivisions=3, radius=16)
-    head.apply_translation([0, 0, 58])
+    head.apply_translation([0, 0, 38])
     return trimesh.boolean.union([body, head])
 
 
@@ -28,11 +28,16 @@ def with_floating_shells(mesh: trimesh.Trimesh) -> trimesh.Trimesh:
 
 
 def with_hole(mesh: trimesh.Trimesh) -> trimesh.Trimesh:
-    """Non-watertight: drop a patch of faces."""
+    """Non-watertight: punch out a contiguous patch of faces on the back of the head.
+
+    A contiguous patch is what a generator actually leaves — a single ragged boundary,
+    not scattered missing triangles.
+    """
     m = mesh.copy()
-    keep = np.ones(len(m.faces), dtype=bool)
-    keep[:40] = False
-    m.update_faces(keep)
+    target = np.array([0.0, -14.0, 40.0])
+    dist = np.linalg.norm(m.triangles_center - target, axis=1)
+    m.update_faces(dist > 3.2)
+    m.remove_unreferenced_vertices()
     return m
 
 

@@ -20,7 +20,7 @@ def load_mesh(path: Path) -> trimesh.Trimesh:
 
 def repair(mesh: trimesh.Trimesh, cfg: dict) -> tuple[trimesh.Trimesh, dict]:
     """Run the fixed repair sequence. Returns the mesh and a record of every op."""
-    before = stats.collect(mesh)
+    before = stats.collect(mesh, measure_wall=True)
     records = []
 
     mesh, r = repair_ops.clean(mesh)
@@ -53,7 +53,7 @@ def repair(mesh: trimesh.Trimesh, cfg: dict) -> tuple[trimesh.Trimesh, dict]:
     mesh, r = repair_ops.scale_to_height(mesh, cfg["scale"]["target_height_mm"])
     records.append(r)
 
-    after = stats.collect(mesh)
+    after = stats.collect(mesh, measure_wall=True)
     return mesh, {
         "before": before.to_dict(),
         "after": after.to_dict(),

@@ -54,21 +54,79 @@ def keep_main_shell(
     )
 
 
+def boundary_loops(mesh: trimesh.Trimesh) -> list[list[int]]:
+    """Ordered vertex cycles for every open boundary of the mesh.
+
+    An edge used by exactly one face is a boundary edge. In a well-formed hole each
+    boundary vertex has exactly two boundary edges, so the loop can be walked. Loops
+    that do not walk cleanly (a pinched vertex shared by two holes) are skipped rather
+    than guessed at — validation will report them.
+    """
+    import networkx as nx
+
+    edges, counts = np.unique(mesh.edges_sorted, axis=0, return_counts=True)
+    boundary = edges[counts == 1]
+    if len(boundary) == 0:
+        return []
+
+    g = nx.Graph()
+    g.add_edges_from(boundary)
+    loops: list[list[int]] = []
+    for component in nx.connected_components(g):
+        sub = g.subgraph(component)
+        if any(d != 2 for _, d in sub.degree()):
+            continue  # pinched or branching boundary: leave it for validation
+        try:
+            loops.append([int(v) for v in nx.cycle_basis(sub)[0]])
+        except IndexError:
+            continue
+    return loops
+
+
+def _loop_perimeter(mesh: trimesh.Trimesh, loop: list[int]) -> float:
+    pts = mesh.vertices[loop]
+    return float(np.linalg.norm(pts - np.roll(pts, -1, axis=0), axis=1).sum())
+
+
 def fill_holes(
     mesh: trimesh.Trimesh, max_perimeter_mm: float = 25.0
 ) -> tuple[trimesh.Trimesh, OpRecord]:
-    """Fill small holes. A hole larger than the cap is left open on purpose so the
-    validation stage fails on it instead of stretching a lie across a missing arm."""
+    """Fill open boundaries. Small holes get a centroid fan; large ones are left open.
+
+    trimesh's own fill_holes only closes triangle and quad holes, which is almost never
+    what a generator leaves behind. Anything it cannot close is fanned from the hole's
+    centroid. A hole larger than the cap is left open on purpose, so validation fails on
+    it rather than stretching a lie across a missing arm.
+    """
     mesh = mesh.copy()
-    before_wt = mesh.is_watertight
+    before_wt = bool(mesh.is_watertight)
     mesh.fill_holes()
-    mesh.fix_normals()
+
+    filled, skipped = 0, []
+    for loop in boundary_loops(mesh):
+        perimeter = _loop_perimeter(mesh, loop)
+        if perimeter > max_perimeter_mm:
+            skipped.append(round(perimeter, 2))
+            continue
+        centroid = mesh.vertices[loop].mean(axis=0)
+        c_idx = len(mesh.vertices)
+        new_faces = [[loop[i], loop[(i + 1) % len(loop)], c_idx] for i in range(len(loop))]
+        mesh = trimesh.Trimesh(
+            vertices=np.vstack([mesh.vertices, centroid]),
+            faces=np.vstack([mesh.faces, np.array(new_faces)]),
+            process=False,
+        )
+        filled += 1
+
+    trimesh.repair.fix_normals(mesh)
     return mesh, OpRecord(
         "fill_holes",
-        mesh.is_watertight != before_wt,
+        bool(mesh.is_watertight) != before_wt or filled > 0,
         {
-            "watertight_before": bool(before_wt),
+            "watertight_before": before_wt,
             "watertight_after": bool(mesh.is_watertight),
+            "holes_filled": filled,
+            "holes_too_large_mm": skipped,
             "max_perimeter_mm": max_perimeter_mm,
         },
     )
