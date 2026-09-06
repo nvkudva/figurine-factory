@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check src tests scripts
+
+      - name: Generate fixtures
+        run: python tests/fixtures/make_fixtures.py
+
+      - name: Test
+        run: pytest -q
+
+  privacy:
+    # The privacy constraint is the one thing a merge must never regress.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: No photos anywhere in history
+        run: |
+          python scripts/check_no_photos.py $(git ls-files)
+          echo "--- scanning full history for image blobs ---"
+          if git rev-list --objects --all \
+             | grep -Ei '\.(jpg|jpeg|png|heic|heif|webp|tiff|bmp|mov|mp4)$' \
+             | grep -Ev '^\S+ (docs/img/|bakeoff/reference/|tests/fixtures/)'; then
+            echo "FAIL: image blobs found in git history outside the allowlist."
+            exit 1
+          fi
+          echo "clean"
