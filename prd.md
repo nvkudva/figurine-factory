@@ -140,7 +140,7 @@ Example: `FAIL min_wall_thickness: 0.41 mm at 3 sites (needs ≥ 0.80 mm for a 0
 
 ## 6. Cross-cutting requirements
 
-- **One command:** `figurine run work/kai/photos --style chibi_vinyl --height 100`.
+- **One command:** `figurine run work/subject-a/photos --style chibi_vinyl --height 100`.
 - **Manifest:** every run writes `manifest.json` — run id, timestamp, git SHA, subject alias
   (never a real name in an artifact that could be shared), style preset + hash, generator
   backend + model version, every seed, every setting, per-stage timing, all mesh stats

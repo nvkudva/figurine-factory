@@ -20,7 +20,7 @@ def test_local_backends_need_no_flag(backend):
 @pytest.mark.parametrize(
     "path",
     [
-        "work/kai/photos/front.jpg",
+        "work/subject-a/photos/front.jpg",
         "out/abc123/reference.png",
         "src/figurine_factory/face.png",
         "docs/kid.jpeg",

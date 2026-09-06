@@ -6,7 +6,7 @@ command. The output is the pipeline, not one model.
 **Success metric:** the second and third figurine each take under **30 minutes** of my time,
 with **zero** manual mesh editing.
 
-Full spec: [`prd.md`](prd.md). Decisions: [`docs/decisions.md`](docs/decisions.md) —
+MIT licensed. Full spec: [`prd.md`](prd.md). Decisions: [`docs/decisions.md`](docs/decisions.md) —
 local TRELLIS.2, a single stylized reference image, FDM.
 
 ## Why this exists
