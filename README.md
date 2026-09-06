@@ -98,6 +98,35 @@ And a run that passes writes the STL, a manifest, and a before/after report:
 | bbox (mm)           | [51.2, 32.0, 86.0] | [43.2, 43.2, 100.0] |
 ```
 
+## Web UI
+
+A local dashboard for browsing runs: gate results, before/after mesh stats, repair
+operations and a 3D preview of the output. Bun + React + Vite + CSS Modules, with SQLite
+as the handoff between the Python pipeline and the UI.
+
+```bash
+cd webui
+bun install
+bun run seed        # sample runs, so the UI works before the generator exists
+bun run build
+bun run api         # http://127.0.0.1:8757
+```
+
+`bun run api` alone serves the built app and the API on one origin. For frontend work,
+run `bun run api` and `bun run ui` in two shells — Vite proxies `/api` to the Bun server.
+
+Publish a real run into the UI:
+
+```bash
+figurine repair raw.glb --height 100
+figurine publish out/<run_id>
+```
+
+The UI binds to **127.0.0.1 only** — this machine holds the photos and the meshes.
+The seeded runs are labelled as mock in the sidebar so sample data never passes for a
+real figurine. Half of them fail on purpose: the screen that says *which gate stopped
+this figurine and what to do about it* is the one worth designing.
+
 ## Repository layout
 
 ```
@@ -112,6 +141,12 @@ src/figurine_factory/
   manifest.py                   everything needed to reproduce a run
   report.py                     before/after mesh stat report
 bakeoff/                        milestone 1 harness, scorecard, deletion log
+webui/                          Bun + React + Vite dashboard, SQLite-backed
+  server/                       Bun.serve API, bun:sqlite queries, mock seed
+  src/                          React components with CSS Modules
+src/figurine_factory/web/
+  schema.sql                    one schema, shared by the Python writer and Bun reader
+  sqlite_sink.py                publishes a run manifest into that database
 tests/fixtures/make_fixtures.py procedural broken meshes — never a photograph
 scripts/check_no_photos.py      pre-commit privacy guard
 ```

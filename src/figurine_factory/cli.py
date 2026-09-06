@@ -104,6 +104,22 @@ def validate(
 
 
 @app.command()
+def publish(
+    run_dir: Path = typer.Argument(..., help="A run directory containing manifest.json."),
+    db: Path = typer.Option(Path("webui/figurine.db"), help="SQLite file the web UI reads."),
+):
+    """Publish a completed run into the web UI's database."""
+    from .web.sqlite_sink import publish as publish_run
+
+    manifest = run_dir / "manifest.json" if run_dir.is_dir() else run_dir
+    if not manifest.exists():
+        console.print(f"[red]no manifest at {manifest}[/]")
+        raise typer.Exit(1)
+    run_id = publish_run(manifest, db)
+    console.print(f"[green]published[/] {run_id} -> {db}")
+
+
+@app.command()
 def doctor():
     """Check this machine against what the pipeline needs. Run it before milestone 1."""
     from . import doctor as doc

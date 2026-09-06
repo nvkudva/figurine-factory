@@ -32,6 +32,30 @@ jobs:
       - name: Test
         run: pytest -q
 
+  webui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webui
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Test
+        run: bun test
+
+      - name: Build
+        run: bunx vite build
+
   privacy:
     # The privacy constraint is the one thing a merge must never regress.
     runs-on: ubuntu-latest

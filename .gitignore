@@ -37,3 +37,10 @@ build/
 weights/
 *.safetensors
 *.ckpt
+
+# ---- web ui ----
+node_modules/
+webui/dist/
+webui/*.db
+webui/*.db-wal
+webui/*.db-shm
