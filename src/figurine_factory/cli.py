@@ -104,6 +104,24 @@ def validate(
 
 
 @app.command()
+def doctor():
+    """Check this machine against what the pipeline needs. Run it before milestone 1."""
+    from . import doctor as doc
+
+    checks = doc.run_checks()
+    for c in checks:
+        mark = "[green]ok  [/]" if c.ok else "[red]MISS[/]"
+        console.print(f"{mark} {c.name}: {c.detail}")
+        if not c.ok and c.blocking:
+            console.print(f"      [dim]blocks {c.blocking}[/]")
+    blocked = [c for c in checks if not c.ok and c.blocking]
+    if blocked:
+        console.print(f"\n[yellow]{len(blocked)} prerequisite(s) missing.[/] "
+                      "Repair and validation still run — that is the point of the split.")
+    raise typer.Exit(0 if not blocked else 1)
+
+
+@app.command()
 def replay(manifest_path: Path = typer.Argument(...)):
     """Re-execute a recorded run with its exact settings and seeds."""
     data = manifestmod.Manifest.read(manifest_path)

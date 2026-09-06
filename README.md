@@ -6,7 +6,8 @@ command. The output is the pipeline, not one model.
 **Success metric:** the second and third figurine each take under **30 minutes** of my time,
 with **zero** manual mesh editing.
 
-Full spec: [`prd.md`](prd.md). Open questions: [`docs/decisions.md`](docs/decisions.md).
+Full spec: [`prd.md`](prd.md). Decisions: [`docs/decisions.md`](docs/decisions.md) —
+local TRELLIS.2, a single stylized reference image, FDM.
 
 ## Why this exists
 
@@ -19,7 +20,8 @@ backends chosen by config.
 
 These are photos of my child.
 
-- Generation runs **locally** by default (TRELLIS.2, MIT; or Hunyuan3D 2.1).
+- Generation runs **locally on TRELLIS.2** (MIT) — decided, see [D1](docs/decisions.md).
+  Needs a 24 GB NVIDIA GPU on Linux; `figurine doctor` checks before you count on it.
 - **No child photos in this repo, in git history, or in any test fixture.** Enforced by
   `.gitignore`, a pre-commit hook (`scripts/check_no_photos.py`), and procedurally generated
   test fixtures. Photos live in untracked `work/`.
@@ -36,7 +38,7 @@ These are photos of my child.
 | 2. Manual end-to-end figurine | not started |
 | 3. Repair automated | **working** — `figurine repair` runs today on any mesh |
 | 4. Validation gates | **working** — `figurine validate`, 8 gates, 15 tests green |
-| 5. One-command run | blocked on D1 (generator choice) |
+| 5. One-command run | generator chosen (TRELLIS.2); stylize + generate stages still to wire |
 | 6. Second subject, no manual editing | not started |
 | 7. README with comparison table + photos | not started |
 
@@ -54,13 +56,16 @@ make test
 ## Use
 
 ```bash
+# Check this machine against what the pipeline needs
+figurine doctor
+
 # Repair and validate a mesh from any generator, then write STL + manifest + report
 figurine repair path/to/raw.glb --height 100
 
 # Score a raw mesh against the print gates without changing it (this is the bake-off metric)
 figurine validate path/to/raw.glb
 
-# Full pipeline (blocked on decision D1)
+# Full pipeline (stylize + generate stages still to wire)
 figurine run work/<alias>/photos --style chibi_vinyl --height 100
 ```
 

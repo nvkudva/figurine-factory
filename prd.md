@@ -193,12 +193,18 @@ Every hosted account's assets are deleted afterwards; the deletion is logged.
 Full-body rigging. Multicolor / AMS painting. Likeness fine-tuning (LoRA on a child's face —
 deliberately excluded, on privacy grounds as well as scope). Web UI. Anyone outside my family.
 
-## 10. Open decisions
+## 10. Decisions
 
-Tracked in `docs/decisions.md`. D1 local vs hosted, D2 single vs multi-view reference,
-D3 resin vs FDM. **These block coding of the generate stage. They do not block repair,
-validate, or slice**, which is where the value is — so those are built first, against
-fixture meshes.
+Settled 2026-09-06, recorded in `docs/decisions.md`:
+
+- **D1 — generation runs locally on TRELLIS.2** (MIT). Needs ≥ 24 GB VRAM on Linux;
+  `figurine doctor` checks before you commit to it. Hosted generators are bake-off-only.
+- **D2 — one stylized reference image**, not multi-view. Matches TRELLIS.2's documented
+  workflow and makes the style preset the thing that keeps a set consistent.
+- **D3 — FDM on the Bambu.** Sets the 0.8 mm minimum wall and the chunky style. Resin
+  stays a config file away.
+
+One question remains a level down: which model does the stylizing. Settle it in milestone 1.
 
 ## 11. Known risks
 
