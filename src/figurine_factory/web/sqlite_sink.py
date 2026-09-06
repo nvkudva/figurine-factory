@@ -85,7 +85,7 @@ def publish(manifest_path: Path, db_path: Path) -> str:
                 (run_id, i, op["op"], int(bool(op["changed"])), json.dumps(op["detail"])),
             )
 
-        for name, detail in manifest.get("stages", {}).items():
+        for name, detail in manifest.get("stages", {}).items():  # noqa: PLW2901
             if name == "repair":
                 detail = {k: v for k, v in detail.items() if k != "operations"}
             conn.execute(

@@ -5,12 +5,6 @@ import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { cx } from "../cx.ts";
 import styles from "./MeshViewer.module.css";
 
-/** Reads the CSS token so the viewer follows the page theme instead of fighting it. */
-function token(name: string, fallback: string): string {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return value || fallback;
-}
-
 export function MeshViewer({ url, hasMesh }: { url: string; hasMesh: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -30,10 +24,14 @@ export function MeshViewer({ url, hasMesh }: { url: string; hasMesh: boolean }) 
     renderer.domElement.className = cx(styles.canvas);
     mount.appendChild(renderer.domElement);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x404050, 2.2));
-    const key = new THREE.DirectionalLight(0xffffff, 1.8);
+    scene.add(new THREE.HemisphereLight(0x9fe8ff, 0x0d1626, 2.0));
+    const key = new THREE.DirectionalLight(0xbfefff, 2.0);
     key.position.set(1, 1.4, 1.2);
     scene.add(key);
+    // Magenta rim light: the edge separation that makes the neon read as neon.
+    const rim = new THREE.DirectionalLight(0xff3ec8, 1.5);
+    rim.position.set(-1.6, 0.4, -1.4);
+    scene.add(rim);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -48,9 +46,11 @@ export function MeshViewer({ url, hasMesh }: { url: string; hasMesh: boolean }) 
         geometry.center();
 
         const material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(token("--accent", "#7aa2f7")),
-          roughness: 0.55,
-          metalness: 0.05,
+          // Pale filament, lit by the cyan key and magenta rim. A neon albedo blows out
+          // to a flat silhouette and hides the surface the gates are talking about.
+          color: new THREE.Color("#cdd9e6"),
+          roughness: 0.38,
+          metalness: 0.28,
           flatShading: false,
         });
         const mesh = new THREE.Mesh(geometry, material);
@@ -106,13 +106,19 @@ export function MeshViewer({ url, hasMesh }: { url: string; hasMesh: boolean }) 
       <div ref={host} style={{ width: "100%", height: "100%" }} />
       {!hasMesh && (
         <div className={styles.overlay}>
-          No mesh. Validation failed, so nothing was written — a bad STL is worse than no STL.
+          <span>
+            <strong>no mesh written</strong>
+            <br />
+            a gate failed, so nothing was emitted —
+            <br />
+            a bad STL is worse than no STL
+          </span>
         </div>
       )}
       {hasMesh && (error || loading) && (
         <div className={styles.overlay}>{error ?? "loading mesh…"}</div>
       )}
-      {hasMesh && !error && !loading && <div className={styles.hint}>drag to orbit · scroll to zoom</div>}
+      {hasMesh && !error && !loading && <div className={styles.hint}>drag · orbit — scroll · zoom</div>}
     </div>
   );
 }

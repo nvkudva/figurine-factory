@@ -1,47 +1,64 @@
-.list { display: flex; flex-direction: column; gap: 2px; padding: 8px; }
+.list { display: flex; flex-direction: column; }
 
 .item {
-  display: block;
+  display: flex;
+  gap: 10px;
   width: 100%;
   text-align: left;
   padding: 10px 12px;
-  border: 1px solid transparent;
-  border-radius: var(--radius);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-left: 2px solid transparent;
   background: transparent;
   color: inherit;
   cursor: pointer;
   font: inherit;
 }
-.item:hover { background: var(--surface-2); }
-.item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.item:hover { background: rgba(34, 230, 255, 0.045); }
+.item:focus-visible { outline: 1px solid var(--cyan); outline-offset: -2px; }
 
-.active { background: var(--surface); border-color: var(--border-strong); }
-.active:hover { background: var(--surface); }
+.active {
+  background: rgba(34, 230, 255, 0.075);
+  border-left-color: var(--cyan);
+  box-shadow: inset 0 0 22px rgba(34, 230, 255, 0.07);
+}
 
-.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.alias { font-weight: 600; }
+.info { min-width: 0; flex: 1; }
+
+.top { display: flex; align-items: center; gap: 8px; }
+.alias { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.03em; }
 
 .meta {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: baseline;
-  margin-top: 5px;
-  font-size: 12px;
-  color: var(--text-dim);
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
 }
 .meta > * { white-space: nowrap; }
-.style { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.when { margin-left: auto; color: var(--text-faint); }
-.id { font-family: var(--mono); color: var(--text-faint); }
+.style { overflow: hidden; text-overflow: ellipsis; min-width: 0; color: var(--text-dim); }
+.when { margin-left: auto; }
+
+.gauge {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+}
+.tick { width: 9px; height: 3px; background: var(--line-hot); }
+.tickPass { background: var(--lime); }
+.tickFail { background: var(--red); box-shadow: var(--glow-red); }
 
 .failed {
-  margin-top: 6px;
-  font-size: 11px;
+  margin-top: 5px;
   font-family: var(--mono);
-  color: var(--fail);
+  font-size: 10px;
+  color: var(--red);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.empty { padding: 24px 16px; color: var(--text-dim); font-size: 13px; }
+.empty { padding: 24px 14px; color: var(--text-faint); font-size: 12px; line-height: 1.6; }
+.empty code { color: var(--cyan); }

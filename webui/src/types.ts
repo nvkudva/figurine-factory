@@ -65,3 +65,24 @@ export interface Status {
   runs: number;
   mock: boolean;
 }
+
+export type PrinterState = "printing" | "idle" | "paused" | "error" | "offline";
+
+export interface Printer {
+  id: string;
+  name: string;
+  model: string;
+  nozzle_mm: number;
+  state: PrinterState;
+  run_id: string | null;
+  subject_alias: string | null;
+  layers: number | null;
+  nozzle_temp: number | null;
+  bed_temp: number | null;
+  filament: string | null;
+  message: string | null;
+  /** 0-1, derived server-side from elapsed time. Null when there is no job. */
+  progress: number | null;
+  layer: number | null;
+  etaSeconds: number | null;
+}

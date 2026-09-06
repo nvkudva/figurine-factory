@@ -3,6 +3,7 @@ import { Database } from "bun:sqlite";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { getRun, listRuns } from "../server/db.ts";
+import { listPrinters } from "../server/printers.ts";
 import { seed } from "../server/seed.ts";
 
 function freshDb(): Database {
@@ -65,5 +66,52 @@ describe("run store", () => {
 
   test("unknown run id returns null", () => {
     expect(getRun(freshDb(), "nope")).toBeNull();
+  });
+});
+
+describe("printer farm", () => {
+  test("orders by attention needed, not by id", () => {
+    const states = listPrinters(freshDb()).map((p) => p.state);
+    expect(states).toEqual(["paused", "printing", "idle"]);
+  });
+
+  test("derives progress from elapsed time against the estimate", () => {
+    const db = freshDb();
+    const start = Date.now() / 1000;
+    const [, printing] = listPrinters(db, start);
+    // Seeded 41 minutes into a 78 minute job.
+    expect(printing!.progress).toBeCloseTo(41 / 78, 2);
+    expect(printing!.layer).toBe(Math.round((41 / 78) * 625));
+    expect(printing!.etaSeconds).toBeCloseTo((78 - 41) * 60, 0);
+  });
+
+  test("progress advances as the clock does", () => {
+    const db = freshDb();
+    const now = Date.now() / 1000;
+    const before = listPrinters(db, now)[1]!.progress!;
+    const after = listPrinters(db, now + 600)[1]!.progress!;
+    expect(after).toBeGreaterThan(before);
+  });
+
+  test("progress is clamped to 1 once the estimate is exceeded", () => {
+    const db = freshDb();
+    const wayLater = Date.now() / 1000 + 86_400;
+    for (const p of listPrinters(db, wayLater)) {
+      if (p.progress !== null) expect(p.progress).toBeLessThanOrEqual(1);
+      if (p.etaSeconds !== null) expect(p.etaSeconds).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  test("an idle printer has no job, no progress and no eta", () => {
+    const idle = listPrinters(freshDb()).find((p) => p.state === "idle");
+    expect(idle?.run_id).toBeNull();
+    expect(idle?.progress).toBeNull();
+    expect(idle?.etaSeconds).toBeNull();
+  });
+
+  test("a stopped printer explains itself", () => {
+    const paused = listPrinters(freshDb()).find((p) => p.state === "paused");
+    expect(paused?.message).toContain("runout");
+    expect(paused?.subject_alias).toBeTruthy();
   });
 });

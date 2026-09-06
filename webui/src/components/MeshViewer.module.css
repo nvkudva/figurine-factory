@@ -1,11 +1,4 @@
-.wrap {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface-2);
-  overflow: hidden;
-}
+.wrap { position: relative; width: 100%; height: 100%; }
 .canvas { display: block; width: 100%; height: 100%; }
 
 .overlay {
@@ -13,17 +6,23 @@
   inset: 0;
   display: grid;
   place-items: center;
-  padding: 20px;
+  padding: 28px;
   text-align: center;
-  color: var(--text-dim);
-  font-size: 13px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.6;
 }
+.overlay strong { color: var(--red); font-weight: 600; }
 
 .hint {
   position: absolute;
-  left: 10px;
-  bottom: 8px;
-  font-size: 11px;
+  left: 12px;
+  top: 10px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--text-faint);
   pointer-events: none;
 }

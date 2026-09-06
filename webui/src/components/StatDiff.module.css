@@ -1,25 +1,27 @@
 .wrap { overflow-x: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table { width: 100%; border-collapse: collapse; font-size: 12px; }
 
 .table th {
   text-align: left;
   padding: 6px 10px;
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-faint);
-  border-bottom: 1px solid var(--border);
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--line);
 }
-.table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
-.table tr:last-child td { border-bottom: 0; }
+.table td { padding: 5px 10px; border-bottom: 1px solid var(--line); }
+.table tbody tr:last-child td { border-bottom: 0; }
 
 .label { color: var(--text-dim); white-space: nowrap; }
 .before { color: var(--text-faint); }
-.after { font-weight: 600; }
+.after { color: var(--text); }
 
-.arrow { color: var(--text-faint); width: 1%; text-align: center; }
-.better { color: var(--pass); }
-.worse { color: var(--fail); }
+.arrow { color: var(--line-hot); width: 1%; text-align: center; font-family: var(--mono); }
+.better { color: var(--lime); }
+.worse { color: var(--red); }
 
-.empty { color: var(--text-dim); font-size: 13px; margin: 0; }
+.empty { color: var(--text-faint); font-size: 12px; margin: 0; }

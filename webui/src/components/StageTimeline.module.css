@@ -1,25 +1,38 @@
-.track { display: flex; gap: 4px; flex-wrap: wrap; }
+.track { display: flex; align-items: stretch; gap: 0; }
 
 .stage {
-  flex: 1 1 90px;
-  min-width: 90px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-right-width: 0;
+  background: var(--panel);
+  position: relative;
 }
-.done { border-color: var(--pass); background: var(--pass-bg); }
-.failedStage { border-color: var(--fail); background: var(--fail-bg); }
-.skipped { opacity: 0.45; border-style: dashed; }
+.stage:last-child { border-right-width: 1px; }
 
 .name {
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.done .name { color: var(--pass); }
-.failedStage .name { color: var(--fail); }
+.time { font-family: var(--mono); font-size: 12px; margin-top: 3px; color: var(--text-dim); }
 
-.time { font-size: 13px; margin-top: 2px; }
+.done { background: linear-gradient(180deg, rgba(108, 255, 143, 0.07), transparent); }
+.done .name { color: var(--lime); }
+.done .time { color: var(--text); }
+
+.failedStage {
+  background: linear-gradient(180deg, rgba(255, 77, 94, 0.12), transparent);
+  border-color: var(--red);
+  z-index: 1;
+}
+.failedStage .name { color: var(--red); }
+.failedStage .time { color: var(--red); }
+
+.skipped { opacity: 0.4; }

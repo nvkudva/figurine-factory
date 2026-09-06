@@ -1,35 +1,46 @@
 .wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 12px; }
 
-.table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .table th {
   text-align: left;
   padding: 6px 10px;
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-faint);
-  border-bottom: 1px solid var(--border);
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
-.table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
-.table tr:last-child td { border-bottom: 0; }
+.table td { padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.table tbody tr:last-child td { border-bottom: 0; }
 
-.name { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
-.mark { width: 1%; white-space: nowrap; }
-.ok { color: var(--pass); font-weight: 600; }
-.no { color: var(--fail); font-weight: 700; }
+.name { font-family: var(--mono); font-size: 11.5px; white-space: nowrap; }
+.mark { width: 1%; white-space: nowrap; font-family: var(--mono); }
+.ok { color: var(--lime); }
+.no { color: var(--red); }
+.req { color: var(--text-faint); }
 
 /* A failing gate is the reason this screen exists. Make it impossible to miss. */
-.failRow { background: var(--fail-bg); }
-.failRow .name { color: var(--fail); font-weight: 600; }
+.failRow { background: rgba(255, 77, 94, 0.075); }
+.failRow .name { color: var(--red); font-weight: 600; }
+.failRow td { border-bottom-color: rgba(255, 77, 94, 0.28); }
 
 .hint {
-  padding: 0 10px 10px 10px;
-  font-size: 12px;
+  padding: 0 10px 9px;
+  font-size: 11.5px;
+  line-height: 1.5;
   color: var(--text-dim);
-  border-bottom: 1px solid var(--border);
 }
-.hintLabel { color: var(--fail); font-weight: 600; margin-right: 6px; }
+.hintLabel {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-right: 7px;
+}
 
-.empty { color: var(--text-dim); font-size: 13px; margin: 0; }
+.empty { color: var(--text-faint); font-size: 12px; margin: 0; }

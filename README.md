@@ -100,9 +100,19 @@ And a run that passes writes the STL, a manifest, and a before/after report:
 
 ## Web UI
 
-A local dashboard for browsing runs: gate results, before/after mesh stats, repair
-operations and a 3D preview of the output. Bun + React + Vite + CSS Modules, with SQLite
-as the handoff between the Python pipeline and the UI.
+A local dashboard, three columns: **runs** with live mesh previews on the left, the
+**object** centre stage, the **printer farm** on the right. Bun + React + Vite + CSS
+Modules, with SQLite as the handoff between the Python pipeline and the UI.
+
+The interface is dark-only on purpose — the neon reads against near-black and nowhere
+else, and a glow palette with a light mode is two designs done badly. Colour carries
+state and chrome; body text and numbers stay high-contrast.
+
+Each printer is drawn rather than described: the gantry rides up as the job progresses
+and the model is revealed bottom-up by a clip rectangle, so the picture *is* the progress
+bar. Progress is derived from elapsed time against the job estimate rather than stored,
+because a stored percentage goes stale the moment nothing updates it. Printers sort by
+how much attention they need, so a paused machine never hides under a running one.
 
 ```bash
 cd webui
@@ -142,7 +152,7 @@ src/figurine_factory/
   report.py                     before/after mesh stat report
 bakeoff/                        milestone 1 harness, scorecard, deletion log
 webui/                          Bun + React + Vite dashboard, SQLite-backed
-  server/                       Bun.serve API, bun:sqlite queries, mock seed
+  server/                       Bun.serve API, bun:sqlite queries, printer farm, seed
   src/                          React components with CSS Modules
 src/figurine_factory/web/
   schema.sql                    one schema, shared by the Python writer and Bun reader

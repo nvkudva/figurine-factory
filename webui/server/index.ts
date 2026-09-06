@@ -7,6 +7,7 @@
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { DB_PATH, getRun, listRuns, openDb } from "./db.ts";
+import { listPrinters } from "./printers.ts";
 
 const PORT = Number(process.env.FIGURINE_PORT ?? 8757);
 const HOST = process.env.FIGURINE_HOST ?? "127.0.0.1";
@@ -49,6 +50,8 @@ const server = Bun.serve({
         mock: (seeded?.n ?? 0) > 0 && seeded?.n === total?.n,
       });
     },
+
+    "/api/printers": () => json(listPrinters(db)),
 
     "/api/runs": {
       GET: () => json(listRuns(db)),

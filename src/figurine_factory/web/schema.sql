@@ -65,3 +65,21 @@ CREATE TABLE IF NOT EXISTS stages (
 
 CREATE INDEX IF NOT EXISTS idx_runs_started ON runs(started_at DESC);
 CREATE INDEX IF NOT EXISTS idx_gates_run    ON gates(run_id, ord);
+
+-- Printer farm. Populated by the seed today; a real Bambu bridge would write the same
+-- rows from the MQTT status topic. The UI does not care which wrote them.
+CREATE TABLE IF NOT EXISTS printers (
+  id            TEXT PRIMARY KEY,
+  name          TEXT NOT NULL,
+  model         TEXT NOT NULL,
+  nozzle_mm     REAL NOT NULL DEFAULT 0.4,
+  state         TEXT NOT NULL,            -- printing | idle | paused | error | offline
+  run_id        TEXT REFERENCES runs(run_id) ON DELETE SET NULL,
+  started_at    REAL,                     -- when the current job started
+  duration_s    REAL,                     -- estimated total for the current job
+  layers        INTEGER,
+  nozzle_temp   REAL,
+  bed_temp      REAL,
+  filament      TEXT,
+  message       TEXT                      -- why it is paused or errored
+);

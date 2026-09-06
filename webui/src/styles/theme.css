@@ -1,62 +1,96 @@
-/* Tokens. Light is the base; dark redefines only colours, never structure. */
+/*
+ * Cyberpunk, committed to a single dark look. A neon interface with a light mode is two
+ * designs badly; the glow only reads against near-black, so there is no light variant.
+ *
+ * Rule that keeps it usable: neon is for state and chrome, never for body text. Numbers
+ * and labels stay high-contrast; only borders, rules, glows and status carry the colour.
+ */
 :root {
-  --bg: #f6f7f8;
-  --surface: #ffffff;
-  --surface-2: #f0f2f4;
-  --border: #dfe3e8;
-  --border-strong: #c4cbd3;
-  --text: #16191d;
-  --text-dim: #5c6672;
-  --text-faint: #8b95a1;
+  color-scheme: dark;
 
-  --pass: #0f7a52;
-  --pass-bg: #e3f5ec;
-  --fail: #c0392f;
-  --fail-bg: #fdeceb;
-  --warn: #9a6200;
-  --warn-bg: #fdf2dd;
-  --accent: #2b5fd9;
-  --accent-bg: #e8eefc;
+  --void: #05060b;
+  --bg: #070910;
+  --panel: #0b0f19;
+  --panel-2: #10151f;
+  --raised: #141b27;
 
-  --radius: 8px;
-  --radius-sm: 5px;
-  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
+  --line: #1c2534;
+  --line-hot: #2a3a52;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1115;
-    --surface: #171a20;
-    --surface-2: #1e222a;
-    --border: #2a2f39;
-    --border-strong: #3a4150;
-    --text: #e8ebef;
-    --text-dim: #98a2b0;
-    --text-faint: #6b7583;
+  --text: #dfe9f5;
+  --text-dim: #8b9bb4;
+  --text-faint: #5b6b83;
 
-    --pass: #4ade9f;
-    --pass-bg: #10281f;
-    --fail: #ff7b6b;
-    --fail-bg: #2c1613;
-    --warn: #f0b45e;
-    --warn-bg: #2b2013;
-    --accent: #7aa2f7;
-    --accent-bg: #16203a;
-  }
+  --cyan: #22e6ff;
+  --cyan-dim: #0e8ba3;
+  --magenta: #ff3ec8;
+  --magenta-dim: #a12680;
+  --lime: #6cff8f;
+  --amber: #ffb547;
+  --red: #ff4d5e;
+
+  --glow-cyan: 0 0 12px rgba(34, 230, 255, 0.35);
+  --glow-magenta: 0 0 12px rgba(255, 62, 200, 0.32);
+  --glow-red: 0 0 12px rgba(255, 77, 94, 0.3);
+
+  --radius: 3px;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
-
 html, body, #root { height: 100%; }
 
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
-  font: 14px/1.5 var(--sans);
+  font: 13px/1.5 var(--sans);
   -webkit-font-smoothing: antialiased;
+  background:
+    /* faint perspective grid, so the panels sit on something */
+    linear-gradient(rgba(34, 230, 255, 0.028) 1px, transparent 1px) 0 0 / 100% 44px,
+    linear-gradient(90deg, rgba(34, 230, 255, 0.028) 1px, transparent 1px) 0 0 / 44px 100%,
+    radial-gradient(1100px 620px at 50% -10%, rgba(34, 230, 255, 0.06), transparent 65%),
+    radial-gradient(760px 520px at 100% 100%, rgba(255, 62, 200, 0.05), transparent 60%),
+    var(--bg);
 }
 
-/* Numbers must line up for scanning; that is the whole job of this UI. */
-.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+/* Scanlines. Kept very low contrast: atmosphere must not cost legibility. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.16) 0 1px,
+    transparent 1px 3px
+  );
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+}
+
+::selection { background: rgba(34, 230, 255, 0.28); }
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: var(--line-hot); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan-dim); }
+
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+/* Section label: the small bracketed heading used across every panel. */
+.label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  body::after { display: none; }
+}

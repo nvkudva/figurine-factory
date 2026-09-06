@@ -162,6 +162,30 @@ const RUNS: Seed[] = [
   },
 ];
 
+/** Three printers, in the three states the right-hand panel has to render well. */
+const PRINTERS = [
+  {
+    id: "p1s-a", name: "BENCH-01", model: "Bambu Lab P1S", nozzle: 0.4,
+    state: "printing", run_id: "ad80ffb135a9",
+    // Started 41 minutes ago against a 78-minute job: mid-print, bar visibly moving.
+    startedMinutesAgo: 41, durationMinutes: 78, layers: 625,
+    nozzle_temp: 220, bed_temp: 60, filament: "PLA Basic · Jade White", message: null,
+  },
+  {
+    id: "p1s-b", name: "BENCH-02", model: "Bambu Lab P1S", nozzle: 0.4,
+    state: "paused", run_id: "e8104bb3d95f",
+    startedMinutesAgo: 12, durationMinutes: 96, layers: 640,
+    nozzle_temp: 180, bed_temp: 60, filament: "PLA Matte · Charcoal",
+    message: "filament runout on AMS slot 1",
+  },
+  {
+    id: "a1-c", name: "BENCH-03", model: "Bambu Lab A1 mini", nozzle: 0.4,
+    state: "idle", run_id: null,
+    startedMinutesAgo: null, durationMinutes: null, layers: null,
+    nozzle_temp: 24, bed_temp: 23, filament: "PLA Basic · Bambu Green", message: null,
+  },
+] as const;
+
 export function seed(db: Database, now = Date.now() / 1000): number {
   const insertRun = db.prepare(
     `INSERT INTO runs (run_id, started_at, subject_alias, outcome, style_preset, style_hash,
@@ -182,9 +206,14 @@ export function seed(db: Database, now = Date.now() / 1000): number {
   const insertStage = db.prepare(
     "INSERT INTO stages (run_id, name, at_seconds, detail_json) VALUES (?,?,?,?)",
   );
+  const insertPrinter = db.prepare(
+    `INSERT INTO printers (id, name, model, nozzle_mm, state, run_id, started_at,
+       duration_s, layers, nozzle_temp, bed_temp, filament, message)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+  );
 
   db.transaction(() => {
-    for (const table of ["gates", "stats", "ops", "stages", "runs"]) {
+    for (const table of ["gates", "stats", "ops", "stages", "printers", "runs"]) {
       db.exec(`DELETE FROM ${table}`);
     }
 
@@ -212,6 +241,15 @@ export function seed(db: Database, now = Date.now() / 1000): number {
 
       r.ops.forEach((o, i) => insertOp.run(r.run_id, i, o.op, o.changed ? 1 : 0, JSON.stringify(o.detail)));
       r.stages.forEach((s) => insertStage.run(r.run_id, s.name, s.at, JSON.stringify(s.detail)));
+    }
+
+    for (const p of PRINTERS) {
+      insertPrinter.run(
+        p.id, p.name, p.model, p.nozzle, p.state, p.run_id,
+        p.startedMinutesAgo === null ? null : now - p.startedMinutesAgo * 60,
+        p.durationMinutes === null ? null : p.durationMinutes * 60,
+        p.layers, p.nozzle_temp, p.bed_temp, p.filament, p.message,
+      );
     }
   })();
 

@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import { api } from "./api.ts";
+import { PrinterCard } from "./components/PrinterCard.tsx";
 import { RunDetail } from "./components/RunDetail.tsx";
 import { RunList } from "./components/RunList.tsx";
-import type { RunDetail as Run, RunSummary, Status } from "./types.ts";
+import type { Printer, RunDetail as Run, RunSummary, Status } from "./types.ts";
 import styles from "./App.module.css";
+
+/** Progress is derived from elapsed time server-side, so a slow poll still animates. */
+const PRINTER_POLL_MS = 5000;
 
 export default function App() {
   const [status, setStatus] = useState<Status | null>(null);
   const [runs, setRuns] = useState<RunSummary[]>([]);
+  const [printers, setPrinters] = useState<Printer[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,41 +28,63 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const load = () => api.printers().then(setPrinters).catch(() => undefined);
+    load();
+    const timer = setInterval(load, PRINTER_POLL_MS);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     if (!selected) return;
     setRun(null);
     api.run(selected).then(setRun).catch((e: Error) => setError(e.message));
   }, [selected]);
 
+  const busy = printers.filter((p) => p.state === "printing").length;
+
   return (
     <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>
-          <h1 className={styles.brandName}>Figurine Factory</h1>
-          <p className={styles.brandSub}>
-            {runs.length} run{runs.length === 1 ? "" : "s"}
-          </p>
+      <header className={styles.topbar}>
+        <span className={styles.mark}>
+          Figurine<span className={styles.slash}>//</span>Factory
+        </span>
+        {status?.mock && <span className={styles.mockChip}>mock data</span>}
+        <div className={styles.topMeta}>
+          <span>runs <b>{runs.length}</b></span>
+          <span>printing <b>{busy}/{printers.length}</b></span>
         </div>
+      </header>
 
-        {status?.mock && (
-          <div className={styles.mockBanner}>
-            <strong>Mock data.</strong> These runs are seeded samples, not real figurines.
-            Publish a real one with <code>figurine publish out/&lt;run_id&gt;</code>.
-          </div>
-        )}
-
-        <div className={styles.scroll}>
-          <RunList runs={runs} selected={selected} onSelect={setSelected} />
+      <aside className={`${styles.col} ${styles.left}`}>
+        <div className={styles.colHead}>
+          <span className="label">[ runs ]</span>
+          <span className={styles.count}>{runs.length}</span>
         </div>
+        <RunList runs={runs} selected={selected} onSelect={setSelected} />
       </aside>
 
-      <main className={styles.main}>
-        {error && <div className={styles.placeholder}>Could not reach the API: {error}</div>}
+      <main className={`${styles.col} ${styles.mid}`}>
+        {error && <div className={`${styles.placeholder} ${styles.error}`}>api unreachable — {error}</div>}
         {!error && run && <RunDetail run={run} />}
-        {!error && !run && selected && <div className={styles.placeholder}>loading…</div>}
-        {!error && !selected && status && (
-          <div className={styles.placeholder}>Select a run.</div>
-        )}
+        {!error && !run && selected && <div className={styles.placeholder}>loading run…</div>}
+        {!error && !selected && status && <div className={styles.placeholder}>select a run</div>}
       </main>
+
+      <aside className={`${styles.col} ${styles.right}`}>
+        <div className={`${styles.colHead} ${styles.rightHead}`}>
+          <span className="label">[ printer farm ]</span>
+          <span className={styles.count}>{busy} active</span>
+        </div>
+        <div className={styles.farm}>
+          {printers.map((p) => <PrinterCard key={p.id} printer={p} />)}
+        </div>
+        {status?.mock && (
+          <p className={styles.farmNote}>
+            Printer state is seeded. A Bambu bridge would write the same rows from the
+            MQTT status topic — the panel would not change.
+          </p>
+        )}
+      </aside>
     </div>
   );
 }

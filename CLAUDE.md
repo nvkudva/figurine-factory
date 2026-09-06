@@ -37,6 +37,11 @@ intake → stylize → generate → repair → validate → slice.
 - `manifest.py` — every run records model, seeds, settings, stats and gate results, so a
   good figurine is reproducible.
 
+`webui/` is a Bun + React + Vite dashboard reading the same SQLite file the pipeline
+writes via `figurine publish`. It is dark-only by design; neon carries state and chrome,
+never body text. Printer progress is derived from elapsed time, never stored — do not
+"fix" that by adding a progress column.
+
 Thresholds live in `configs/default.yaml` and `configs/printers/*.yaml`, never in code.
 Style presets live in `configs/presets/styles/*.yaml` and are content-hashed into the
 manifest, which is what keeps a set of figurines matching.

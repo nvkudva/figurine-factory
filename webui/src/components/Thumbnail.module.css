@@ -1,0 +1,35 @@
+.frame {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(rgba(34, 230, 255, 0.05) 1px, transparent 1px) 0 0 / 100% 8px,
+    var(--void);
+  overflow: hidden;
+}
+.img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+.pending, .none {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-faint);
+}
+.none { color: var(--red); }
+
+/* Corner ticks: cheap way to make every preview read as a targeting reticle. */
+.frame::before, .frame::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-color: var(--cyan-dim);
+  border-style: solid;
+  opacity: 0.75;
+}
+.frame::before { top: 2px; left: 2px; border-width: 1px 0 0 1px; }
+.frame::after { right: 2px; bottom: 2px; border-width: 0 1px 1px 0; }
